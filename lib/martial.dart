@@ -232,15 +232,6 @@ class _MartialClassState extends State<MartialClass> {
             children: <Widget>[
               const SizedBox(height: 30),
               if (widget.pc == "Monk") modBlock("Wisdom"),
-              // if (widget.pc == "Rogue") modBlock("mod"),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  roundButton(modidec, minus()),
-                  numberbetween(modi),
-                  roundButton(modiinc, plus()),
-                ],
-              ),
               const SizedBox(height: 30),
               levelBlock(),
               Row(
