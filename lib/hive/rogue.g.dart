@@ -16,12 +16,11 @@ class RogueAdapter extends TypeAdapter<Rogue> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Rogue(
-      fields[0] as int,
-      fields[1] as int,
-      fields[2] as int,
-      fields[3] as int,
-    );
+    return Rogue()
+      ..level = fields[0] as int?
+      ..modi = fields[1] as int?
+      ..sa = fields[2] as int?
+      ..sol = fields[3] as int?;
   }
 
   @override

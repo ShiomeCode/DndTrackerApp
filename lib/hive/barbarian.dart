@@ -13,9 +13,13 @@ class Barbarian extends HiveObject {
   @HiveField(2)
   int? bc;
 
-  Barbarian(int level, int rage, int bc) {
-    this.level = 1;
-    this.rage = 2;
-    this.bc = 0;
+  @HiveField(3)
+  int? ragedmg;
+
+  Barbarian() {
+    level = 1;
+    rage = 2;
+    bc = 0;
+    ragedmg = 2;
   }
 }

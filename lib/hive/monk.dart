@@ -16,10 +16,10 @@ class Monk extends HiveObject {
   @HiveField(3)
   int? um;
 
-  Monk(int level, int ki, int kidc, int um) {
-    this.level = 1;
-    this.ki = 0;
-    this.kidc = 0;
-    this.um = 0;
+  Monk() {
+    level = 1;
+    ki = 0;
+    kidc = 0;
+    um = 0;
   }
 }

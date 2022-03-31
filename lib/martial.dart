@@ -1,6 +1,11 @@
+import 'package:dndspelltrack/hive/barbarian.dart';
+import 'package:dndspelltrack/hive/fighter.dart';
+import 'package:dndspelltrack/hive/monk.dart';
+import 'package:dndspelltrack/hive/rogue.dart';
 import 'package:flutter/material.dart';
 import 'package:dndspelltrack/helpers/listgenerators.dart';
 import 'package:dndspelltrack/helpers/styles.dart';
+import 'package:hive/hive.dart';
 
 class MartialClass extends StatefulWidget {
   final String? pc;
@@ -11,6 +16,8 @@ class MartialClass extends StatefulWidget {
 }
 
 class _MartialClassState extends State<MartialClass> {
+  dynamic activeClass;
+
   int level = 1;
   int modi = -5;
 
@@ -26,112 +33,109 @@ class _MartialClassState extends State<MartialClass> {
   int sa = 1; // Sneak Attack
   int sol = 1; // Stroke of Luck
 
-  void levelinc() {
+  void levelinc() async {
+    Box box = await Hive.openBox(widget.pc ?? "");
+
     setState(() {
       level++;
-      sa = (level / 2).ceil();
       if (level >= 20) level = 20;
+      if (widget.pc == "Rogue") box.put(2, (level / 2).ceil());
+      sa = box.getAt(2);
+      sol = box.getAt(3);
+      box.put(0, level);
+
       rageperlevel();
+      if (widget.pc == "Barbarian") box.put(1, rages);
 
       if (level >= 2) {
-        acs = 1;
-        kidc = (8 + pb[level - 1] + modi);
-        um = 10;
+        if (widget.pc == "Fighter") box.put(2, 1);
+        if (widget.pc == "Monk") {
+          box.put(2, (8 + pb[level - 1] + modi));
+          box.put(3, 10);
+        }
       }
 
-      if (level > 2) ki = level;
-      if (level >= 5) {
-        ea = 1;
+      if (widget.pc == "Barbarian") {
+        if (level >= 9 && level < 13) box.put(2, 1);
+        if (level >= 13 && level < 17) box.put(2, 2);
+        if (level >= 17) box.put(2, 3);
+        bc = box.getAt(2);
       }
 
-      if (level >= 6) {
-        um = 15;
+      if (widget.pc == "Fighter") {
+        if (level >= 5) box.put(3, 1);
+        if (level >= 9) box.put(4, 1);
+        if (level >= 11) box.put(3, 2);
+        if (level >= 13) box.put(4, 2);
+        if (level >= 17) box.put(4, 3);
+        if (level >= 17) box.put(2, 2);
+        if (level >= 20) box.put(3, 3);
+        acs = box.getAt(2);
+        ea = box.getAt(3);
+        ind = box.getAt(4);
       }
 
-      if (level >= 9 && level < 13) {
-        bc = 1;
-      }
-
-      if (level >= 10) {
-        um = 20;
-      }
-
-      if (level >= 11) {
-        ea = 2;
-      }
-
-      if (level >= 13 && level < 17) {
-        bc = 2;
-      }
-
-      if (level >= 14) {
-        um = 25;
-      }
-
-      if (level >= 17) {
-        bc = 3;
-        acs = 2;
-      }
-
-      if (level >= 18) {
-        um = 30;
-      }
-
-      if (level >= 20) {
-        ea = 3;
+      if (widget.pc == "Monk") {
+        if (level >= 2) box.put(1, level);
+        if (level >= 6) box.put(3, 15);
+        if (level >= 10) box.put(3, 20);
+        if (level >= 14) box.put(3, 25);
+        if (level >= 18) box.put(3, 30);
+        ki = box.getAt(1);
+        kidc = box.getAt(2);
+        um = box.getAt(3);
       }
     });
   }
 
-  void leveldec() {
+  void leveldec() async {
+    Box box = await Hive.openBox(widget.pc ?? "");
+
     setState(() {
       level--;
       sa = (level / 2).ceil();
+      if (widget.pc == "Rogue") box.put(2, sa);
       if (level <= 1) {
         level = 1;
-        acs = 0;
-        ki = 0;
-        um = 0;
+        if (widget.pc == "Fighter") box.put(2, 0);
+        if (widget.pc == "Monk") box.put(1, 0);
+        if (widget.pc == "Monk") box.put(3, 0);
       }
+      box.put(0, level);
       rageperlevel();
-      if (level >= 2) ki = level;
-      if (level >= 2) {
-        acs = 1;
-        um = 10;
+      if (widget.pc == "Barbarian") {
+        box.put(1, rages);
+        if (level >= 9 && level < 13) box.put(2, 1);
+        if (level >= 13 && level < 17) box.put(2, 2);
+        if (level >= 17) box.put(2, 3);
+        bc = box.getAt(2);
       }
 
-      if (level >= 6) {
-        um = 15;
+      if (widget.pc == "Fighter") {
+        if (level >= 2) box.put(2, 1);
+        if (level >= 9) box.put(4, 1);
+        if (level >= 13) box.put(4, 2);
+        if (level >= 17) box.put(2, 2);
+        if (level >= 17) box.put(4, 3);
+        if (level < 20 && level >= 12) box.put(3, 2);
+        if (level <= 11 && level >= 5) box.put(3, 1);
+        if (level <= 4) box.put(3, 0);
+        acs = box.getAt(2);
+        ea = box.getAt(3);
+        ind = box.getAt(4);
       }
 
-      if (level >= 9 && level < 13) {
-        bc = 1;
+      if (widget.pc == "Monk") {
+        if (level >= 2) box.put(1, level);
+        if (level >= 2) box.put(3, 10);
+        if (level >= 6) box.put(3, 15);
+        if (level >= 10) box.put(3, 20);
+        if (level >= 14) box.put(3, 25);
+        if (level >= 18) box.put(3, 30);
+        ki = box.getAt(1);
+        kidc = box.getAt(2);
+        um = box.getAt(3);
       }
-
-      if (level >= 10) {
-        um = 20;
-      }
-
-      if (level >= 13 && level < 17) {
-        bc = 2;
-      }
-
-      if (level >= 14) {
-        um = 25;
-      }
-
-      if (level >= 17) {
-        bc = 3;
-        acs = 2;
-      }
-
-      if (level >= 18) {
-        um = 30;
-      }
-
-      if (level < 20 && level >= 12) ea = 2;
-      if (level <= 11 && level >= 5) ea = 1;
-      if (level <= 4) ea = 0;
     });
   }
 
@@ -146,77 +150,186 @@ class _MartialClassState extends State<MartialClass> {
     });
   }
 
-  void ragedec() {
+  void ragedec() async {
+    Box box = await Hive.openBox("Barbarian");
     setState(() {
       rages--;
       if (rages <= 0) rages = 0;
+      box.put(1, rages);
     });
   }
 
-  void swdec() {
+  void swdec() async {
+    Box box = await Hive.openBox("Fighter");
     setState(() {
       sw--;
       if (sw <= 0) sw = 0;
+      box.put(1, sw);
     });
   }
 
-  void ascdec() {
+  void ascdec() async {
+    Box box = await Hive.openBox("Fighter");
     setState(() {
       acs--;
       if (acs <= 0) acs = 0;
+      box.put(2, acs);
     });
   }
 
-  void inddec() {
+  void inddec() async {
+    Box box = await Hive.openBox("Fighter");
     setState(() {
       ind--;
       if (ind <= 0) ind = 0;
+      box.put(4, ind);
     });
   }
 
-  void kidec() {
+  void kidec() async {
+    Box box = await Hive.openBox("Monk");
     setState(() {
       ki--;
       if (ki <= 0) ki = 0;
+      box.put(2, ki);
     });
   }
 
-  void soldec() {
+  void soldec() async {
+    Box box = await Hive.openBox("Rogue");
     setState(() {
       sol--;
       if (sol <= 0) sol = 0;
+      box.put(3, sol);
+      sol = box.getAt(3);
     });
   }
 
-  void martiallongrest() {
+  void martiallongrest() async {
     rageperlevel();
+    Box box = await Hive.openBox("Barbarian");
+    if (widget.pc == "Barbarian") box.put(1, rages);
     martialshortrest();
   }
 
-  void martialshortrest() {
+  void martialshortrest() async {
+    Box box = await Hive.openBox(widget.pc ?? "");
     setState(() {
-      sw = 1;
-      ki = level;
-      if (level >= 2) acs = 1;
-      if (level >= 17) acs = 2;
-      if (level >= 20) sol = 1;
+      if (widget.pc == "Monk") box.put(1, level);
+      if (widget.pc == "Monk") modi = (box.getAt(2) - 8 - pb[level - 1]);
+
+      if (widget.pc == "Fighter") box.put(1, 1);
+      if (level >= 2 && widget.pc == "Fighter") box.put(2, 1);
+      if (level >= 9 && widget.pc == "Fighter") box.put(4, 1);
+      if (level >= 13 && widget.pc == "Fighter") box.put(4, 2);
+      if (level >= 17 && widget.pc == "Fighter") box.put(2, 2);
+      if (level >= 17 && widget.pc == "Fighter") box.put(4, 3);
+      if (level >= 20 && widget.pc == "Rogue") box.put(3, 1);
+
+      boxRead();
     });
   }
 
-  void modiinc() {
+  void modiinc() async {
+    Box box = await Hive.openBox(widget.pc ?? "");
     setState(() {
       modi++;
       if (modi >= 10) modi = 10;
+      box.put(1, modi);
       kidc = (8 + pb[level] + modi);
+      if (widget.pc == "Monk") box.put(2, kidc);
+      kidc = box.getAt(2);
+      modi = (box.getAt(2) - 8 - pb[level - 1]);
     });
   }
 
-  void modidec() {
+  void modidec() async {
+    Box box = await Hive.openBox(widget.pc ?? "");
     setState(() {
       modi--;
       if (modi <= -5) modi = -5;
+      box.put(1, modi);
       kidc = (8 + pb[level] + modi);
+      if (widget.pc == "Monk") box.put(2, kidc);
+      kidc = box.getAt(2);
+      modi = (box.getAt(2) - 8 - pb[level - 1]);
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    boxRead();
+  }
+
+  void boxRead() async {
+    Box box = await Hive.openBox(widget.pc ?? "");
+    switch (widget.pc) {
+      case "Barbarian":
+        if (box.isEmpty) {
+          Barbarian barb = Barbarian();
+          await box.put(0, barb.level);
+          await box.put(1, barb.rage);
+          await box.put(2, barb.bc);
+        }
+        setState(() {
+          level = box.getAt(0);
+          rages = box.getAt(1);
+          bc = box.getAt(2);
+        });
+        break;
+      case "Fighter":
+        if (box.isEmpty) {
+          Fighter fighter = Fighter();
+          await box.put(0, fighter.level);
+          await box.put(1, fighter.sw);
+          await box.put(2, fighter.acs);
+          await box.put(3, fighter.ea);
+          await box.put(4, fighter.ind);
+        }
+        setState(() {
+          level = box.getAt(0);
+          sw = box.getAt(1);
+          acs = box.getAt(2);
+          ea = box.getAt(3);
+          ind = box.getAt(4);
+        });
+        break;
+      case "Monk":
+        if (box.isEmpty) {
+          Monk monk = Monk();
+          await box.put(0, monk.level);
+          await box.put(1, monk.ki);
+          await box.put(2, monk.kidc);
+          await box.put(3, monk.um);
+        }
+        setState(() {
+          level = box.getAt(0);
+          ki = box.getAt(1);
+          kidc = box.getAt(2);
+          um = box.getAt(3);
+          modi = (box.getAt(2) - 8 - pb[level - 1]);
+        });
+        break;
+      case "Rogue":
+        if (box.isEmpty) {
+          Rogue rogue = Rogue();
+          await box.put(0, rogue.level);
+          await box.put(1, rogue.modi);
+          await box.put(2, rogue.sa);
+          await box.put(3, rogue.sol);
+        }
+
+        setState(() {
+          level = box.getAt(0);
+          modi = box.getAt(1);
+          sa = box.getAt(2);
+          sol = box.getAt(3);
+        });
+        break;
+      default:
+        break;
+    }
   }
 
   @override
@@ -232,6 +345,14 @@ class _MartialClassState extends State<MartialClass> {
             children: <Widget>[
               const SizedBox(height: 30),
               if (widget.pc == "Monk") modBlock("Wisdom"),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  if (widget.pc == "Monk") roundButton(modidec, minus()),
+                  if (widget.pc == "Monk") numberbetween(modi),
+                  if (widget.pc == "Monk") roundButton(modiinc, plus()),
+                ],
+              ),
               const SizedBox(height: 30),
               levelBlock(),
               Row(
@@ -253,9 +374,9 @@ class _MartialClassState extends State<MartialClass> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   if (widget.pc == "Barbarian")
-                    martialFeature1("Rage", ragedec, rages),
-                  if (widget.pc == "Barbarian" && level >= 9)
-                    martialFeature1("Brutal Critical", () {}, bc),
+                    martialFeature1("Rages", ragedec, rages),
+                  if (widget.pc == "Barbarian")
+                    martialFeature1("Rage dmg", () {}, ragedmg[level]),
                   if (widget.pc == "Fighter")
                     martialFeature1("Second Wind", swdec, sw),
                   if (widget.pc == "Fighter" && level >= 2)
@@ -274,6 +395,8 @@ class _MartialClassState extends State<MartialClass> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  if (widget.pc == "Barbarian" && level >= 9)
+                    martialFeature1("Brutal Critical", () {}, bc),
                   if (widget.pc == "Fighter" && level >= 5)
                     martialFeature1("Extra Attack", () {}, ea),
                   if (widget.pc == "Fighter" && level >= 9)

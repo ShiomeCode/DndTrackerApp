@@ -16,10 +16,14 @@ class Fighter extends HiveObject {
   @HiveField(3)
   int? ea;
 
-  Fighter(int level, int sw, int acs, int ea) {
-    this.level = 1;
-    this.sw = 1;
-    this.acs = 1;
-    this.ea = 0;
+  @HiveField(4)
+  int? ind;
+
+  Fighter() {
+    level = 1;
+    sw = 1;
+    acs = 1;
+    ea = 0;
+    ind = 1;
   }
 }

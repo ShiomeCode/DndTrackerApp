@@ -16,23 +16,25 @@ class BarbarianAdapter extends TypeAdapter<Barbarian> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Barbarian(
-      fields[0] as int,
-      fields[1] as int,
-      fields[2] as int,
-    );
+    return Barbarian()
+      ..level = fields[0] as int?
+      ..rage = fields[1] as int?
+      ..bc = fields[2] as int?
+      ..ragedmg = fields[3] as int?;
   }
 
   @override
   void write(BinaryWriter writer, Barbarian obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.level)
       ..writeByte(1)
       ..write(obj.rage)
       ..writeByte(2)
-      ..write(obj.bc);
+      ..write(obj.bc)
+      ..writeByte(3)
+      ..write(obj.ragedmg);
   }
 
   @override

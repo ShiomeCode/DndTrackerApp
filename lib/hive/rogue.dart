@@ -16,10 +16,10 @@ class Rogue extends HiveObject {
   @HiveField(3)
   int? sol;
 
-  Rogue(int level, int modi, int sa, int sol) {
-    this.level = 1;
-    this.modi = -5;
-    this.sa = 1;
-    this.sol = 1;
+  Rogue() {
+    level = 1;
+    modi = 0;
+    sa = 1;
+    sol = 1;
   }
 }

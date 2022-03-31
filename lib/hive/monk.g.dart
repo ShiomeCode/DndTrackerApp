@@ -16,12 +16,11 @@ class MonkAdapter extends TypeAdapter<Monk> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Monk(
-      fields[0] as int,
-      fields[1] as int,
-      fields[2] as int,
-      fields[3] as int,
-    );
+    return Monk()
+      ..level = fields[0] as int?
+      ..ki = fields[1] as int?
+      ..kidc = fields[2] as int?
+      ..um = fields[3] as int?;
   }
 
   @override

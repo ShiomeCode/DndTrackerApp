@@ -16,18 +16,18 @@ class FighterAdapter extends TypeAdapter<Fighter> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Fighter(
-      fields[0] as int,
-      fields[1] as int,
-      fields[2] as int,
-      fields[3] as int,
-    );
+    return Fighter()
+      ..level = fields[0] as int?
+      ..sw = fields[1] as int?
+      ..acs = fields[2] as int?
+      ..ea = fields[3] as int?
+      ..ind = fields[4] as int?;
   }
 
   @override
   void write(BinaryWriter writer, Fighter obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.level)
       ..writeByte(1)
@@ -35,7 +35,9 @@ class FighterAdapter extends TypeAdapter<Fighter> {
       ..writeByte(2)
       ..write(obj.acs)
       ..writeByte(3)
-      ..write(obj.ea);
+      ..write(obj.ea)
+      ..writeByte(4)
+      ..write(obj.ind);
   }
 
   @override
