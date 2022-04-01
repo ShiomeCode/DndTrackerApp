@@ -16,11 +16,10 @@ class BardAdapter extends TypeAdapter<Bard> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Bard(
-      fields[0] as int,
-      fields[1] as int,
-      (fields[2] as List).cast<dynamic>(),
-    );
+    return Bard()
+      ..level = fields[0] as int?
+      ..bi = fields[1] as int?
+      ..spellSlots = (fields[2] as List?)?.cast<int>();
   }
 
   @override

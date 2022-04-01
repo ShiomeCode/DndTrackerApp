@@ -16,11 +16,10 @@ class ClericAdapter extends TypeAdapter<Cleric> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Cleric(
-      fields[0] as int,
-      fields[1] as int,
-      (fields[2] as List).cast<dynamic>(),
-    );
+    return Cleric()
+      ..level = fields[0] as int?
+      ..cd = fields[1] as int?
+      ..spellSlots = (fields[2] as List?)?.cast<int>();
   }
 
   @override

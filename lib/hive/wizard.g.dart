@@ -16,11 +16,10 @@ class WizardAdapter extends TypeAdapter<Wizard> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Wizard(
-      fields[0] as int,
-      fields[1] as int,
-      (fields[2] as List).cast<dynamic>(),
-    );
+    return Wizard()
+      ..level = fields[0] as int?
+      ..ar = fields[1] as int?
+      ..spellSlots = (fields[2] as List?)?.cast<int>();
   }
 
   @override

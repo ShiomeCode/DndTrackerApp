@@ -16,11 +16,10 @@ class DruidAdapter extends TypeAdapter<Druid> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Druid(
-      fields[0] as int,
-      fields[1] as int,
-      (fields[2] as List).cast<dynamic>(),
-    );
+    return Druid()
+      ..level = fields[0] as int?
+      ..ws = fields[1] as int?
+      ..spellSlots = (fields[2] as List?)?.cast<int>();
   }
 
   @override

@@ -1,5 +1,11 @@
 import 'package:dndspelltrack/helpers/listgenerators.dart';
+import 'package:dndspelltrack/hive/bard.dart';
+import 'package:dndspelltrack/hive/cleric.dart';
+import 'package:dndspelltrack/hive/druid.dart';
+import 'package:dndspelltrack/hive/sorcerer.dart';
+import 'package:dndspelltrack/hive/wizard.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 import 'helpers/styles.dart';
 
@@ -20,7 +26,14 @@ class _FullCasterState extends State<FullCaster> {
   int sp = 0; //Sorcerer Points
   int ar = 0; //Arcane Recovery
 
-  FullCasterLevels slots = FullCasterLevels(fullcasterlevels);
+  List<int> slots = fullcasterlevels[0];
+
+  @override
+  void initState() {
+    super.initState();
+    boxRead();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,64 +44,103 @@ class _FullCasterState extends State<FullCaster> {
     );
   }
 
-  void levelinc() {
+  void levelinc() async {
+    Box box = await Hive.openBox(widget.pc ?? "");
+
     setState(() {
       level++;
       if (level > 20) level = 20;
+      box.put(0, level);
+      box.put(2, fullcasterlevels[level]);
+      slots = fullcasterlevels[level];
 
-      // Cleric specific
-      if (level >= 18) cd = 3;
-      if (level >= 6 && level < 18) cd = 2;
+      switch (widget.pc) {
+        case "Cleric":
+          if (level >= 18) cd = 3;
+          if (level >= 6 && level < 18) cd = 2;
+          box.put(1, cd);
+          break;
 
-      // Sorcerer specific
-      if (level >= 2) sp = level;
+        case "Sorcerer":
+          if (level >= 2) {
+            sp = level;
+            box.put(1, sp);
+          }
+          break;
+        default:
+      }
     });
   }
 
-  void leveldec() {
+  void leveldec() async {
+    Box box = await Hive.openBox(widget.pc ?? "");
+
     setState(() {
       level--;
       if (level < 1) level = 1;
+      box.put(0, level);
+      box.put(2, fullcasterlevels[level]);
+      slots = fullcasterlevels[level];
 
       // Cleric specific
-      if (level <= 17) cd = 2;
-      if (level <= 5) cd = 1;
+      switch (widget.pc) {
+        case "Cleric":
+          if (level <= 17) cd = 2;
+          if (level <= 5) cd = 1;
+          box.put(1, cd);
+          break;
 
-      if (level <= 1) sp = 0;
+        case "Sorcerer":
+          if (level <= 1) sp = 0;
+          box.put(1, sp);
+          break;
+      }
     });
   }
 
-  void biinc() {
+  void biinc() async {
+    Box box = await Hive.openBox("Bard");
     setState(() {
       bi++;
+      if (bi >= 7) bi = 7;
+      box.put(1, bi);
     });
   }
 
-  void bidec() {
+  void bidec() async {
+    Box box = await Hive.openBox("Bard");
     setState(() {
       bi--;
       if (bi < 0) bi = 0;
+      box.put(1, bi);
     });
   }
 
-  void cddec() {
+  void cddec() async {
+    Box box = await Hive.openBox("Cleric");
+
     setState(() {
       cd--;
       if (cd < 0) cd = 0;
+      box.put(1, cd);
     });
   }
 
-  void wsdec() {
+  void wsdec() async {
+    Box box = await Hive.openBox("Druid");
     setState(() {
       ws--;
       if (ws < 0) ws = 0;
+      box.put(1, ws);
     });
   }
 
-  void spdec() {
+  void spdec() async {
+    Box box = await Hive.openBox("Sorcerer");
     setState(() {
       sp--;
       if (sp < 0) sp = 0;
+      box.put(1, sp);
     });
   }
 
@@ -99,35 +151,115 @@ class _FullCasterState extends State<FullCaster> {
     return ar;
   }
 
-  void ardec() {
-    setState(() {
-      ar--;
-      if (ar <= 0) ar = 0;
-    });
-  }
-
-  void fclongrest() {
+  void fclongrest() async {
     FullCasterLevels _reset = FullCasterLevels.generate();
-    for (var i = 0; i < 9; i++) {
-      slots.spellSlots![level][i] = _reset.spellSlots![level][i];
+    Box box = await Hive.openBox(widget.pc ?? "");
+    box.put(2, _reset.spellSlots![level]);
+    slots = box.getAt(2);
 
-      // Sorcerer specific
-      if (level >= 2) sp = level;
-
-      // Uses setstate to update view
-      fcshortrest();
+    // Sorcerer specific
+    if (level >= 2 && widget.pc == "Sorcerer") {
+      sp = level;
+      box.put(1, sp);
     }
+
+    // Uses setstate to update view
+    fcshortrest();
+    boxRead();
   }
 
-  void fcshortrest() {
+  void fcshortrest() async {
+    Box box = await Hive.openBox(widget.pc ?? "");
+
     setState(() {
-      // Cleric specific
-      if (level >= 18) cd = 3;
-      if (level >= 6 && level < 18) cd = 2;
-      if (level <= 5) cd = 1;
-      // Druid specific
-      ws = 2;
+      if (widget.pc == "Cleric") {
+        if (level >= 18) cd = 3;
+        if (level >= 6 && level < 18) cd = 2;
+        if (level <= 5) cd = 1;
+        box.put(1, cd);
+      }
+
+      if (widget.pc == "Druid") {
+        ws = 2;
+        box.put(1, ws);
+      }
     });
+  }
+
+  void boxRead() async {
+    Box box = await Hive.openBox(widget.pc ?? "");
+    switch (widget.pc) {
+      case "Bard":
+        if (box.isEmpty) {
+          Bard bard = Bard();
+          await box.put(0, bard.level);
+          await box.put(1, bard.bi);
+          await box.put(2, bard.spellSlots);
+        }
+        setState(() {
+          level = box.getAt(0);
+          bi = box.getAt(1);
+
+          print(box.getAt(2));
+          slots = box.getAt(2);
+        });
+        break;
+      case "Cleric":
+        if (box.isEmpty) {
+          Cleric cleric = Cleric();
+          await box.put(0, cleric.level);
+          await box.put(1, cleric.cd);
+          await box.put(2, cleric.spellSlots);
+        }
+        setState(() {
+          level = box.getAt(0);
+          cd = box.getAt(1);
+          slots = box.getAt(2);
+        });
+        break;
+
+      case "Druid":
+        if (box.isEmpty) {
+          Druid druid = Druid();
+          await box.put(0, druid.level);
+          await box.put(1, druid.ws);
+          await box.put(2, druid.spellSlots);
+        }
+        setState(() {
+          level = box.getAt(0);
+          ws = box.getAt(1);
+          slots = box.getAt(2);
+        });
+        break;
+      case "Sorcerer":
+        if (box.isEmpty) {
+          Sorcerer sorc = Sorcerer();
+          await box.put(0, sorc.level);
+          await box.put(1, sorc.sp);
+          await box.put(2, sorc.spellSlots);
+        }
+        setState(() {
+          level = box.getAt(0);
+          sp = box.getAt(1);
+          slots = box.getAt(2);
+        });
+        break;
+      case "Wizard":
+        if (box.isEmpty) {
+          Wizard wizard = Wizard();
+          await box.put(0, wizard.level);
+          await box.put(1, wizard.ar);
+          await box.put(2, wizard.spellSlots);
+        }
+        setState(() {
+          level = box.getAt(0);
+          ar = box.getAt(1);
+          slots = box.getAt(2);
+        });
+        break;
+      default:
+        break;
+    }
   }
 
   Widget spellslotTracker(String? pc) {
@@ -195,14 +327,18 @@ class _FullCasterState extends State<FullCaster> {
               child: TextButton(
                   onPressed: () {
                     setState(() {
-                      slots.spellSlots![_level][_i]--;
-                      if (slots.spellSlots![_level][_i] < 0) {
-                        slots.spellSlots![_level][_i] = 0;
+                      slots[_i]--;
+                      if (slots[_i] < 0) {
+                        slots[_i] = 0;
                       }
+                      Hive.openBox(widget.pc ?? "")
+                          .then((box) => box.put(2, slots));
+                      fullcasterlevels =
+                          FullCasterLevels.generate().spellSlots!;
                     });
                   },
                   child: Text(
-                    slots.spellSlots![_level][_i].toString(),
+                    slots[_i].toString(),
                     style: const TextStyle(color: Colors.white, fontSize: 20),
                   )),
             ),
@@ -237,7 +373,7 @@ class _FullCasterState extends State<FullCaster> {
     } else if (_pc == "Sorcerer") {
       return classSpecificBlock(spdec, sp, "Sorcerer Points");
     } else if (_pc == "Wizard") {
-      return classSpecificBlock(ardec, arcalc(), "Arcane Recovery 1/day");
+      return classSpecificBlock(() {}, arcalc(), "Arcane Recovery 1/day");
     } else {
       return const Center(child: Text("Something Went Wrong :("));
     }
@@ -257,7 +393,7 @@ Widget classSpecificBlock(_function, int _classResource, String _name) {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          roundButton(_function, minus()),
+          if (_name != "Arcane Recovery 1/day") roundButton(_function, minus()),
           numberbetween(_classResource),
           if (_name == "Arcane Recovery 1/day")
             const Text(

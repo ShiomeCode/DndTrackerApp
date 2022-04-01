@@ -15,7 +15,7 @@ List<String> classes = [
 ];
 
 class FullCasterLevels {
-  List<dynamic>? spellSlots;
+  List<List<int>>? spellSlots;
 
   FullCasterLevels(this.spellSlots);
 

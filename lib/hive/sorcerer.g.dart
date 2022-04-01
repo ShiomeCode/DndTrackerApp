@@ -16,11 +16,10 @@ class SorcererAdapter extends TypeAdapter<Sorcerer> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Sorcerer(
-      fields[0] as int,
-      fields[1] as int,
-      (fields[2] as List).cast<dynamic>(),
-    );
+    return Sorcerer()
+      ..level = fields[0] as int?
+      ..sp = fields[1] as int?
+      ..spellSlots = (fields[2] as List?)?.cast<int>();
   }
 
   @override
