@@ -16,10 +16,9 @@ class RangerAdapter extends TypeAdapter<Ranger> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Ranger(
-      fields[0] as int,
-      (fields[1] as List).cast<dynamic>(),
-    );
+    return Ranger()
+      ..level = fields[0] as int?
+      ..spellSlots = (fields[1] as List?)?.cast<int>();
   }
 
   @override

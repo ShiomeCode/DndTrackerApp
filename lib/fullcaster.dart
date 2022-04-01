@@ -27,6 +27,7 @@ class _FullCasterState extends State<FullCaster> {
   int ar = 0; //Arcane Recovery
 
   List<int> slots = fullcasterlevels[0];
+  FullCasterLevels maxSlots = FullCasterLevels.generate();
 
   @override
   void initState() {
@@ -199,8 +200,6 @@ class _FullCasterState extends State<FullCaster> {
         setState(() {
           level = box.getAt(0);
           bi = box.getAt(1);
-
-          print(box.getAt(2));
           slots = box.getAt(2);
         });
         break;
@@ -315,7 +314,8 @@ class _FullCasterState extends State<FullCaster> {
       padding: const EdgeInsets.all(12.0),
       child: Column(
         children: [
-          Text(slotType[_i], style: const TextStyle(fontSize: 18)),
+          Text(slotType[_i] + " (${maxSlots.spellSlots![_level][_i]})",
+              style: const TextStyle(fontSize: 18)),
           Container(
             decoration: BoxDecoration(
                 boxShadow: [shadow()],

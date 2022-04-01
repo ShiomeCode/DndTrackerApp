@@ -73,7 +73,7 @@ List<List<int>> fullcasterlevels = [
 ];
 
 class HalfCasterLevels {
-  List<dynamic>? spellSlots;
+  List<List<int>>? spellSlots;
 
   HalfCasterLevels(this.spellSlots);
   HalfCasterLevels.generate() {
@@ -199,4 +199,28 @@ List<int> ragedmg = [
   4,
   4,
   4
+];
+
+List<int> infusionsKnown = [
+  0,
+  0,
+  4,
+  4,
+  4,
+  4,
+  6,
+  6,
+  6,
+  6,
+  8,
+  8,
+  8,
+  8,
+  10,
+  10,
+  10,
+  10,
+  12,
+  12,
+  12
 ];

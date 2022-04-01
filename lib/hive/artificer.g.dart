@@ -16,13 +16,12 @@ class ArtificerAdapter extends TypeAdapter<Artificer> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Artificer(
-      fields[0] as int,
-      fields[1] as int,
-      fields[2] as int,
-      fields[3] as int,
-      (fields[4] as List).cast<dynamic>(),
-    );
+    return Artificer()
+      ..level = fields[0] as int?
+      ..castingMod = fields[1] as int?
+      ..ik = fields[2] as int?
+      ..fog = fields[3] as int?
+      ..spellSlots = (fields[4] as List?)?.cast<int>();
   }
 
   @override

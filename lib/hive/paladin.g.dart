@@ -16,13 +16,12 @@ class PaladinAdapter extends TypeAdapter<Paladin> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Paladin(
-      fields[0] as int,
-      fields[1] as int,
-      fields[2] as int,
-      fields[3] as int,
-      (fields[4] as List).cast<dynamic>(),
-    );
+    return Paladin()
+      ..level = fields[0] as int?
+      ..cd = fields[1] as int?
+      ..ds = fields[2] as int?
+      ..loh = fields[3] as int?
+      ..spellSlots = (fields[4] as List?)?.cast<int>();
   }
 
   @override
